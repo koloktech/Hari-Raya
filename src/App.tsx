@@ -222,7 +222,8 @@ export default function App() {
             </button>
           </div>
           <h1 className="text-5xl font-bold mb-3 font-serif tracking-tight">Hari Raya</h1>
-          <p className="text-emerald-200/90 text-sm font-medium mb-5">Jejak tugasan harian anda menjelang Syawal.</p>
+          <p className="text-emerald-200/90 text-sm font-medium mb-1">Jejak tugasan harian anda menjelang Syawal.</p>
+          <p className="text-amber-300/90 text-[11px] italic mb-5">* Task boleh ditukar dan didelete ikut kesesuaian</p>
           
           {/* Sedekah Button */}
           <a 
@@ -335,7 +336,7 @@ export default function App() {
                 </span>
                 <button
                   onClick={() => deleteTask(activeDay, task.id)}
-                  className="opacity-0 group-hover:opacity-100 text-stone-300 hover:text-red-500 transition-all focus:outline-none focus:opacity-100 p-1"
+                  className="text-stone-300 hover:text-red-500 transition-all focus:outline-none p-1"
                   aria-label="Delete task"
                 >
                   <Trash2 size={18} />
