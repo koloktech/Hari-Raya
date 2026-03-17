@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle, Circle, Plus, Trash2, Moon, Star, CalendarDays, Bell, BellRing, Heart, RefreshCw } from 'lucide-react';
+import { Analytics } from '@vercel/analytics/react';
 
 type Task = {
   id: string;
@@ -397,6 +398,7 @@ export default function App() {
           Developed by Hana and Syameem . for personal use only.
         </div>
       </div>
+      <Analytics />
     </div>
   );
 }
