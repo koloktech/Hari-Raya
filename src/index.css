@@ -14,4 +14,19 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+  
+  .animate-marquee {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 15s linear infinite;
+  }
+  
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
 }

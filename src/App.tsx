@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle, Circle, Plus, Trash2, Moon, Star, CalendarDays, Bell, BellRing } from 'lucide-react';
+import { CheckCircle, Circle, Plus, Trash2, Moon, Star, CalendarDays, Bell, BellRing, Heart, RefreshCw } from 'lucide-react';
 
 type Task = {
   id: string;
@@ -168,15 +168,28 @@ export default function App() {
     }));
   };
 
+  const clearDayTasks = (day: string) => {
+    // We use a simple state-based confirmation or just clear it directly.
+    // To make it easy, we'll just clear it directly. Users can add tasks back if needed.
+    setTasks(prev => ({
+      ...prev,
+      [day]: []
+    }));
+  };
+
+  const resetToDefault = () => {
+    setTasks(INITIAL_TASKS);
+  };
+
   const currentDayTasks = tasks[activeDay] || [];
   const completedCount = currentDayTasks.filter(t => t.completed).length;
   const totalCount = currentDayTasks.length;
   const progress = totalCount === 0 ? 0 : (completedCount / totalCount) * 100;
 
   return (
-    <div className="min-h-screen bg-[#fdfbf7] font-sans text-stone-800 pb-24">
+    <div className="min-h-screen bg-[#fdfbf7] font-sans text-stone-800 pb-32">
       {/* Header */}
-      <header className="bg-emerald-800 text-emerald-50 pt-14 pb-8 px-6 rounded-b-[2.5rem] shadow-lg relative overflow-hidden">
+      <header className="bg-emerald-800 text-emerald-50 pt-14 pb-10 px-6 rounded-b-[2.5rem] shadow-lg relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute -top-10 -right-10 opacity-10 text-emerald-200">
           <Moon size={240} strokeWidth={1} />
@@ -202,7 +215,18 @@ export default function App() {
             </button>
           </div>
           <h1 className="text-5xl font-bold mb-3 font-serif tracking-tight">Hari Raya</h1>
-          <p className="text-emerald-200/90 text-sm font-medium">Jejak tugasan harian anda menjelang Syawal.</p>
+          <p className="text-emerald-200/90 text-sm font-medium mb-5">Jejak tugasan harian anda menjelang Syawal.</p>
+          
+          {/* Sedekah Button */}
+          <a 
+            href="https://sedekah.je/?state=Sarawak" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 w-full bg-emerald-700/60 hover:bg-emerald-600/80 text-emerald-50 py-3 px-4 rounded-2xl backdrop-blur-md transition-all duration-200 text-sm font-semibold border border-emerald-500/30 shadow-sm hover:shadow-md group"
+          >
+            <Heart size={18} className="text-amber-400 group-hover:scale-110 transition-transform" fill="currentColor" />
+            Jom Sedekah (Sarawak)
+          </a>
         </div>
       </header>
 
@@ -215,7 +239,18 @@ export default function App() {
         >
           <div className="flex justify-between items-end mb-4">
             <div>
-              <h2 className="text-xl font-bold text-stone-800">Progress {activeDay}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold text-stone-800">Progress {activeDay}</h2>
+                {currentDayTasks.length > 0 && (
+                  <button 
+                    onClick={() => clearDayTasks(activeDay)}
+                    className="text-stone-400 hover:text-red-500 transition-colors p-1 rounded-full hover:bg-red-50"
+                    title="Kosongkan senarai hari ini"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
               <p className="text-sm font-medium text-stone-500 mt-1">{completedCount} dari {totalCount} selesai</p>
             </div>
             <span className="text-3xl font-black text-emerald-600 tracking-tighter">{Math.round(progress)}%</span>
@@ -311,13 +346,20 @@ export default function App() {
               <CalendarDays className="mx-auto mb-4 opacity-40" size={40} strokeWidth={1.5} />
               <p className="text-sm font-medium">Tiada tugasan untuk hari ini.</p>
               <p className="text-xs mt-1 opacity-70">Tambah tugasan baru di bawah.</p>
+              <button 
+                onClick={resetToDefault}
+                className="mt-6 inline-flex items-center gap-2 px-4 py-2 bg-stone-100 hover:bg-stone-200 text-stone-600 rounded-xl text-xs font-semibold transition-colors"
+              >
+                <RefreshCw size={14} />
+                Kembalikan Tugasan Asal
+              </button>
             </motion.div>
           )}
         </div>
       </main>
 
       {/* Fixed Add Task Input at bottom */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#fdfbf7] via-[#fdfbf7] to-transparent z-30">
+      <div className="fixed bottom-6 left-0 right-0 p-4 bg-gradient-to-t from-[#fdfbf7] via-[#fdfbf7] to-transparent z-30">
         <form 
           onSubmit={addTask}
           className="max-w-md mx-auto flex gap-2 bg-white p-2 rounded-2xl shadow-lg border border-stone-100"
@@ -338,6 +380,13 @@ export default function App() {
             <Plus size={20} strokeWidth={2.5} />
           </button>
         </form>
+      </div>
+
+      {/* Watermark */}
+      <div className="fixed bottom-0 left-0 right-0 bg-emerald-900 text-emerald-50/80 text-[11px] font-medium py-1.5 overflow-hidden z-40">
+        <div className="whitespace-nowrap animate-marquee">
+          Developed by Hana and Syameem . for personal use only.
+        </div>
       </div>
     </div>
   );
