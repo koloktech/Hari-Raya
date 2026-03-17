@@ -147,9 +147,16 @@ export default function App() {
     e.preventDefault();
     if (!newTaskText.trim()) return;
     
+    // Security/Performance limit: Max 50 tasks per day to prevent local storage abuse
+    const currentTasks = tasks[activeDay] || [];
+    if (currentTasks.length >= 50) {
+      alert("Maksimum 50 tugasan sehari dibenarkan untuk memastikan aplikasi berjalan lancar.");
+      return;
+    }
+    
     const newTask: Task = {
       id: Date.now().toString(),
-      text: newTaskText.trim(),
+      text: newTaskText.trim().substring(0, 150), // Limit text length
       completed: false
     };
     
@@ -369,6 +376,7 @@ export default function App() {
             value={newTaskText}
             onChange={(e) => setNewTaskText(e.target.value)}
             placeholder="Tambah tugasan baru..."
+            maxLength={150}
             className="flex-grow bg-transparent px-4 py-2 text-[15px] font-medium text-stone-800 focus:outline-none placeholder:text-stone-400"
             autoComplete="off"
           />
