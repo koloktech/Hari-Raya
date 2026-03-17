@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CheckCircle, Circle, Plus, Trash2, Moon, Star, CalendarDays, Bell, BellRing, Heart, RefreshCw } from 'lucide-react';
+import { CheckCircle, Circle, Plus, Trash2, Moon, Star, CalendarDays, Bell, BellRing, Heart, RefreshCw, MessageSquare, Check, X } from 'lucide-react';
 
 type Task = {
   id: string;
   text: string;
   completed: boolean;
+  remark?: string;
 };
 
 type DayTasks = {
@@ -72,6 +73,8 @@ export default function App() {
   const [activeDay, setActiveDay] = useState("Selasa");
   const [newTaskText, setNewTaskText] = useState("");
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission | 'default'>('default');
+  const [editingRemarkId, setEditingRemarkId] = useState<string | null>(null);
+  const [remarkInput, setRemarkInput] = useState("");
 
   // Initialize active day to actual current day
   useEffect(() => {
@@ -173,6 +176,25 @@ export default function App() {
       ...prev,
       [day]: prev[day].filter(t => t.id !== taskId)
     }));
+  };
+
+  const startEditingRemark = (task: Task) => {
+    setEditingRemarkId(task.id);
+    setRemarkInput(task.remark || "");
+  };
+
+  const saveRemark = (day: string, taskId: string) => {
+    setTasks(prev => ({
+      ...prev,
+      [day]: prev[day].map(t => t.id === taskId ? { ...t, remark: remarkInput.trim() } : t)
+    }));
+    setEditingRemarkId(null);
+    setRemarkInput("");
+  };
+
+  const cancelEditingRemark = () => {
+    setEditingRemarkId(null);
+    setRemarkInput("");
   };
 
   const clearDayTasks = (day: string) => {
@@ -329,18 +351,63 @@ export default function App() {
                     <Circle className="text-stone-300 hover:text-emerald-400 transition-colors" size={24} />
                   )}
                 </button>
-                <span className={`flex-grow text-[15px] leading-relaxed pt-0.5 transition-colors duration-200 ${
-                  task.completed ? 'text-stone-400 line-through' : 'text-stone-700 font-medium'
-                }`}>
-                  {task.text}
-                </span>
-                <button
-                  onClick={() => deleteTask(activeDay, task.id)}
-                  className="text-stone-300 hover:text-red-500 transition-all focus:outline-none p-1"
-                  aria-label="Delete task"
-                >
-                  <Trash2 size={18} />
-                </button>
+                <div className="flex flex-col flex-grow pt-0.5">
+                  <span className={`text-[15px] leading-relaxed transition-colors duration-200 ${
+                    task.completed ? 'text-stone-400 line-through' : 'text-stone-700 font-medium'
+                  }`}>
+                    {task.text}
+                  </span>
+                  
+                  {/* Remark Display */}
+                  {task.remark && editingRemarkId !== task.id && (
+                    <div className="mt-1.5 text-xs text-stone-500 bg-stone-100/80 p-2 rounded-lg border border-stone-200/50">
+                      <span className="font-semibold text-stone-400 mr-1">Nota:</span>
+                      {task.remark}
+                    </div>
+                  )}
+
+                  {/* Remark Edit Mode */}
+                  {editingRemarkId === task.id && (
+                    <div className="mt-2 flex gap-1.5 items-center">
+                      <input
+                        type="text"
+                        value={remarkInput}
+                        onChange={(e) => setRemarkInput(e.target.value)}
+                        placeholder="Tambah nota/remark..."
+                        maxLength={100}
+                        className="flex-grow text-xs px-3 py-1.5 bg-stone-100 border border-stone-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        autoFocus
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') saveRemark(activeDay, task.id);
+                          if (e.key === 'Escape') cancelEditingRemark();
+                        }}
+                      />
+                      <button onClick={() => saveRemark(activeDay, task.id)} className="p-1.5 bg-emerald-100 text-emerald-600 rounded-md hover:bg-emerald-200 transition-colors">
+                        <Check size={14} />
+                      </button>
+                      <button onClick={cancelEditingRemark} className="p-1.5 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-colors">
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex flex-col gap-2 items-center">
+                  <button
+                    onClick={() => startEditingRemark(task)}
+                    className="text-stone-300 hover:text-emerald-500 transition-all focus:outline-none p-1"
+                    aria-label="Add remark"
+                  >
+                    <MessageSquare size={16} />
+                  </button>
+                  <button
+                    onClick={() => deleteTask(activeDay, task.id)}
+                    className="text-stone-300 hover:text-red-500 transition-all focus:outline-none p-1"
+                    aria-label="Delete task"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </motion.div>
             ))}
           </AnimatePresence>
